@@ -1,15 +1,71 @@
+# Gradle and Android build output
+.gradle/
+.kotlin/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# IDE settings
+.idea/
+.vscode/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+*.ipr
+*.iws
+
+# Local machine settings and signing material
 local.properties
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+google-services.json
+service-account*.json
+credentials*.json
+
+# Local databases and device exports
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+data/src/main/java/com/aiden3630/data/matule_users_db.json
+data/src/main/java/com/aiden3630/data/shop_products.json
+
+# Packaged applications and archives
+*.apk
+*.aab
+*.apks
+*.aar
+*.exe
+*.msi
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.dmg
+*.iso
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local service artifacts and generated source dumps
+.codebase-memory/
+FULL_PROJECT_CODE.txt
+project_code.txt
+FINAL_SHPORA*.txt
