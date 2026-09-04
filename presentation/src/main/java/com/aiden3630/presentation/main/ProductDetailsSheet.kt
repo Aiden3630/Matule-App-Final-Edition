@@ -23,6 +23,7 @@ fun ProductDetailsSheet(
     title: String,
     price: String,
     description: String,
+    consumption: String,
     onDismiss: () -> Unit,
     onAddToCart: () -> Unit
 ) {
@@ -68,10 +69,24 @@ fun ProductDetailsSheet(
                 style = BodyText.copy(lineHeight = 22.sp),
                 color = MatuleBlack
             )
-        }
-        // Кнопка
-        Box(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
-            MatuleButton(text = "Добавить за $price", onClick = onAddToCart)
+            if (consumption.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "Примерный расход:",
+                    style = Caption.copy(fontSize = 14.sp),
+                    color = MatuleTextGray
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = consumption,
+                    style = Title3.copy(fontWeight = FontWeight.Bold),
+                    color = MatuleBlack
+                )
+            }
+            // Кнопка
+            Box(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+                MatuleButton(text = "Добавить за $price", onClick = onAddToCart)
+            }
         }
     }
 }

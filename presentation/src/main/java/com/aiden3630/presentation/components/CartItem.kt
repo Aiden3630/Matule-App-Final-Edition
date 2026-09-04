@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,11 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.aiden3630.presentation.theme.*
-import com.aiden3630.presentation.theme.MatuleBlack
-import com.aiden3630.presentation.theme.MatuleError
-import com.aiden3630.presentation.theme.MatuleInputBg
-import com.aiden3630.presentation.theme.MatuleWhite
 import com.aiden3630.presentation.R as UiKitR
 
 @Composable
@@ -33,39 +31,56 @@ fun CartItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(138.dp) // Высота по макету
-            .shadow(4.dp, RoundedCornerShape(12.dp), spotColor = Color(0xFFE4E8F5))
+            .height(138.dp) // Высота по CSS
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color(0xFFE4E8F5)
+            )
             .background(MatuleWhite, RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                // Название товара
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // --- ВЕРХНЯЯ ЧАСТЬ ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                // Название
                 Text(
                     text = title,
-                    style = Headline.copy(fontWeight = FontWeight.Medium),
+                    style = Headline.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
+                    ),
+                    color = MatuleBlack,
                     modifier = Modifier.weight(1f),
                     maxLines = 2
                 )
 
-                // Иконка удаления
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Крестик (Удалить)
                 Icon(
-                    painter = painterResource(id = UiKitR.drawable.ic_delete),
+                    painter = painterResource(id = UiKitR.drawable.ic_close), // Используем крестик (ic_close или ic_delete)
                     contentDescription = "Delete",
-                    tint = MatuleError,
+                    tint = MatuleGrayIcon, // Серый цвет, как на скрине
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(24.dp)
                         .clickable { onDeleteClick() }
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Цена и Счетчик
+            // --- НИЖНЯЯ ЧАСТЬ ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Цена
                 Text(
                     text = price,
                     style = Title3.copy(fontWeight = FontWeight.SemiBold),
@@ -74,30 +89,57 @@ fun CartItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Счетчик
+                // Текст "1 штук"
+                Text(
+                    text = "$count штук",
+                    style = BodyText.copy(fontWeight = FontWeight.Normal),
+                    color = MatuleBlack
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Блок кнопок +/- (Серый фон, скругление 8dp)
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .background(MatuleInputBg, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .height(32.dp)
+                        .background(MatuleInputBg, RoundedCornerShape(8.dp)), // Фон #F5F5F9
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = UiKitR.drawable.ic_minus),
-                        contentDescription = "Minus",
-                        modifier = Modifier.size(20.dp).clickable { onMinusClick() },
-                        tint = MatuleBlack
+                    // Минус
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { onMinusClick() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = UiKitR.drawable.ic_minus), // Или просто черточка
+                            contentDescription = "-",
+                            tint = MatuleGrayIcon,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+
+                    // Разделитель (вертикальная черта)
+                    VerticalDivider(
+                        modifier = Modifier.height(16.dp),
+                        color = Color(0xFFEBEBEB)
                     )
 
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "$count шт", style = BodyText)
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Icon(
-                        painter = painterResource(id = UiKitR.drawable.ic_plus),
-                        contentDescription = "Plus",
-                        modifier = Modifier.size(20.dp).clickable { onPlusClick() },
-                        tint = MatuleBlack
-                    )
+                    // Плюс
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { onPlusClick() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = UiKitR.drawable.ic_plus),
+                            contentDescription = "+",
+                            tint = MatuleGrayIcon,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
         }

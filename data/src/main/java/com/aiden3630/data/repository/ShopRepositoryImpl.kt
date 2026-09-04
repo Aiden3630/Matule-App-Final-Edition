@@ -1,6 +1,7 @@
 package com.aiden3630.data.repository
 
 import android.content.Context
+import com.aiden3630.data.di.CartRequest
 import com.aiden3630.domain.model.Product
 import com.aiden3630.domain.repository.ShopRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,6 +22,23 @@ class ShopRepositoryImpl @Inject constructor(
         prettyPrint = true
         coerceInputValues = true
     }
+    override suspend fun addProductToRemoteCart(productId: String, count: Int) {
+        try {
+            val userId = "user_123"
+
+            val request = CartRequest(
+                userId = userId,
+                productId = productId,
+                count = count
+            )
+
+            kotlinx.coroutines.delay(500)
+            android.util.Log.d("ShopRepo", "Товар $productId отправлен на сервер для юзера $userId")
+
+        } catch (exception: Exception) {
+            throw Exception("Не удалось синхронизировать корзину с сервером")
+        }
+    }
 
     private val fileName = "shop_products.json"
 
@@ -28,25 +46,30 @@ class ShopRepositoryImpl @Inject constructor(
      * Метод получения списка товаров.
      * Если файла не существует, он создается с начальным набором данных.
      */
-    override fun getProducts(): Flow<List<Product>> = flow {
+    override fun getProducts(): kotlinx.coroutines.flow.Flow<List<com.aiden3630.domain.model.Product>> = kotlinx.coroutines.flow.flow {
         try {
-            val file = File(context.filesDir, fileName)
 
-            // Проверка наличия файла базы данных
-            if (!file.exists()) {
-                val defaultData = getDefaultProducts()
-                val jsonString = jsonParser.encodeToString(defaultData)
-                file.writeText(jsonString)
+            val externalFolder = context.getExternalFilesDir(null)
+            val productsFile = java.io.File(externalFolder, fileName)
+
+            // Если файла еще нет (первый запуск) — создаем его с дефолтными данными
+            if (!productsFile.exists()) {
+                val defaultProductsList = getDefaultProducts()
+                val productsJsonString = jsonParser.encodeToString(defaultProductsList)
+                productsFile.writeText(productsJsonString)
+                android.util.Log.d("ShopRepository", "Файл товаров создан по адресу: ${productsFile.absolutePath}")
             }
 
-            // Чтение данных из файла
-            val content = file.readText()
-            // Используем библиотеку сериализации для превращения текста в объекты
-            val products = jsonParser.decodeFromString<List<Product>>(content)
-            emit(products)
+            // Читаем содержимое файла
+            val fileContentString = productsFile.readText()
 
-        } catch (e: Exception) {
-            android.util.Log.e("ShopRepository", "Ошибка чтения JSON: ${e.message}")
+            // Превращаем текст в список объектов Product
+            val parsedProductsList = jsonParser.decodeFromString<List<com.aiden3630.domain.model.Product>>(fileContentString)
+
+            emit(parsedProductsList)
+
+        } catch (exception: Exception) {
+            android.util.Log.e("ShopRepository", "Ошибка при работе с файлом товаров: ${exception.message}")
             emit(emptyList())
         }
     }
@@ -67,7 +90,8 @@ class ShopRepositoryImpl @Inject constructor(
                         "Кардные составы берите в большое количество сложений, вязать будем резинку 1х1, плотненько.\n" +
                         "Пряжу 1400-1500м в 100г в 4 сложения, пряжу 700м в 2 сложения. Ориентир для конечной толщины – 300-350м в 100г.\n" +
                         "Артикулы, из которых мы вязали эту модель: Zermatt Zegna Baruffa, Cashfive, Baby Cashmere Loro Piana, Soft Donegal и другие.\n" +
-                        "Примерный расход на шапку с подгибом 70-90г."
+                        "Примерный расход на шапку с подгибом 70-90г." ,
+                consumption = "80-90 г"
             ),
             Product(
                 id = 2,
@@ -79,7 +103,8 @@ class ShopRepositoryImpl @Inject constructor(
                         "Рекомендуемая пряжа: хлопок с акрилом (50/50) или чистый хлопок мерсеризованный.\n" +
                         "Спицы: №3 для резинки, №4 для основного полотна.\n" +
                         "Плотность вязания: 20 петель х 28 рядов = 10х10 см.\n" +
-                        "Особенности: вяжутся снизу вверх, без швов, пояс на кулиске."
+                        "Особенности: вяжутся снизу вверх, без швов, пояс на кулиске.",
+                consumption = "80-90 г"
             ),
             Product(
                 id = 3,

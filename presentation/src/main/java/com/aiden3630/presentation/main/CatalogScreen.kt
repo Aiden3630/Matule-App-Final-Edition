@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aiden3630.domain.model.Product
+import com.aiden3630.presentation.components.ErrorBanner
 import com.aiden3630.presentation.components.MatuleChip
 import com.aiden3630.presentation.components.MatuleSearchField
 import com.aiden3630.presentation.components.ProductCard
@@ -40,9 +41,10 @@ fun CatalogScreen(
     val cartTotal by cartViewModel.totalSum.collectAsState()
 
     var selectedProductForSheet by remember { mutableStateOf<Product?>(null) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val categories = listOf("Все", "Мужчинам", "Женщинам", "Детям", "Аксессуары")
+    val categories = listOf("Все", "Женщинам", "Мужчинам", "Детям", "Аксессуары")
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -50,12 +52,13 @@ fun CatalogScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MatuleWhite)
-                .padding(horizontal = 20.dp),
-            contentPadding = PaddingValues(bottom = 100.dp)
+                .statusBarsPadding() // Чтобы не наезжало на часы
+                .padding(horizontal = 20.dp), // left/right: 20px
+            contentPadding = PaddingValues(bottom = 100.dp) // Место под кнопку корзины
         ) {
-            // Хедер
+            // --- 1. Хедер (Поиск + Профиль) ---
             item {
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp)) // Отступ сверху (top: 72px минус статусбар)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -63,14 +66,15 @@ fun CatalogScreen(
                     MatuleSearchField(
                         value = searchText,
                         onValueChange = { catalogViewModel.onSearchTextChange(it) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f) // Поиск занимает всё место
                     )
 
-                    Spacer(modifier = Modifier.width(14.dp))
+                    Spacer(modifier = Modifier.width(14.dp)) // Отступ до профиля
 
+                    // Иконка профиля (черная, без фона, как в CSS)
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(48.dp) // Зона клика
                             .clickable { onProfileClick() },
                         contentAlignment = Alignment.CenterEnd
                     ) {
@@ -78,16 +82,18 @@ fun CatalogScreen(
                             painter = painterResource(id = UiKitR.drawable.ic_profile_black),
                             contentDescription = "Profile",
                             tint = MatuleBlack,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(32.dp) // Размер иконки 32x32
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp)) // Отступ до категорий
             }
 
-            // Категории
+            // --- 2. Категории ---
             item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     items(categories.size) { index ->
                         MatuleChip(
                             text = categories[index],
@@ -98,23 +104,18 @@ fun CatalogScreen(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp)) // Отступ до списка
             }
 
-            // Товары
+            // --- 3. Товары ---
             if (products.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Ничего не найдено",
-                            style = BodyText,
-                            color = MatuleTextGray
-                        )
+                        Text("Ничего не найдено", style = BodyText, color = MatuleTextGray)
                     }
                 }
             } else {
-                items(items = products) { product: Product ->
-
+                items(products) { product ->
                     val isProductInCart = cartItems.any { cartItem -> cartItem.product.id == product.id }
 
                     ProductCard(
@@ -122,17 +123,16 @@ fun CatalogScreen(
                         price = "${product.price} ₽",
                         category = product.category,
                         isInCart = isProductInCart,
-
                         onAddClick = { cartViewModel.onPlusClick(product) },
                         onRemoveClick = { cartViewModel.onDeleteClick(product) },
                         onClick = { selectedProductForSheet = product }
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
 
-        // Кнопка Корзины
+        // --- 4. Кнопка Корзины ---
         if (cartTotal > 0) {
             Box(
                 modifier = Modifier
@@ -140,8 +140,8 @@ fun CatalogScreen(
                     .padding(bottom = 20.dp, start = 20.dp, end = 20.dp)
                     .fillMaxWidth()
                     .height(56.dp)
-                    .shadow(10.dp, RoundedCornerShape(12.dp), spotColor = Color(0x40000000))
-                    .background(MatuleBlue, RoundedCornerShape(12.dp))
+                    .shadow(10.dp, RoundedCornerShape(10.dp), spotColor = Color(0x40000000))
+                    .background(MatuleBlue, RoundedCornerShape(10.dp)) // CSS: radius 10px
                     .clickable { onCartClick() }
             ) {
                 Row(
@@ -157,11 +157,18 @@ fun CatalogScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("В корзину", style = Title3.copy(color = MatuleWhite, fontWeight = FontWeight.SemiBold))
                 }
-                Text("$cartTotal ₽", style = Title3.copy(color = MatuleWhite, fontWeight = FontWeight.SemiBold), modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp))
+                Text(
+                    text = "$cartTotal ₽",
+                    style = Title3.copy(color = MatuleWhite, fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp)
+                )
             }
         }
 
-        // Шторка
+        // --- 5. Баннер ошибки ---
+        ErrorBanner(message = errorMsg, onDismiss = { errorMsg = null })
+
+        // --- 6. Шторка ---
         if (selectedProductForSheet != null) {
             ModalBottomSheet(
                 onDismissRequest = { selectedProductForSheet = null },
@@ -174,6 +181,7 @@ fun CatalogScreen(
                     price = "${selectedProductForSheet!!.price} ₽",
                     description = selectedProductForSheet!!.description,
                     onDismiss = { selectedProductForSheet = null },
+                    consumption = selectedProductForSheet!!.consumption,
                     onAddToCart = {
                         cartViewModel.onPlusClick(selectedProductForSheet!!)
                         selectedProductForSheet = null

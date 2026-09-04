@@ -9,7 +9,8 @@ data class Product(
     val price: Int,
     val category: String,
     val imageUrl: String? = null,
-    val description: String = ""
+    val description: String = "",
+    val consumption: String = ""
 )
 
 // Класс для корзины (оставь его здесь же, если он нужен)

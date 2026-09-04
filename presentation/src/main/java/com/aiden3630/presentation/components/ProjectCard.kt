@@ -16,61 +16,60 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.aiden3630.presentation.theme.*
-import com.aiden3630.presentation.theme.MatuleBlack
-import com.aiden3630.presentation.theme.MatuleBlue
-import com.aiden3630.presentation.theme.MatuleInputBg
-import com.aiden3630.presentation.theme.MatuleTextGray
-import com.aiden3630.presentation.theme.MatuleWhite
 import coil.compose.AsyncImage
+import com.aiden3630.presentation.theme.*
+import java.io.File
 
 @Composable
 fun ProjectCard(
     title: String,
     date: String,
     imageUri: String? = null,
+    showImage: Boolean = true,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .wrapContentHeight()
             .shadow(4.dp, RoundedCornerShape(12.dp), spotColor = Color(0xFFE4E8F5))
             .background(MatuleWhite, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
 
+            // Заголовок
             Text(
                 text = title,
                 style = Headline.copy(fontWeight = FontWeight.SemiBold),
                 color = MatuleBlack
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MatuleInputBg),
-                contentAlignment = Alignment.Center
-            ) {
-                if (imageUri != null) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
+            if (showImage) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp) // Высота картинки
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MatuleInputBg),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (imageUri != null) {
+                        AsyncImage(
+                            model = File(imageUri),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
-            // Нижняя строка
+            // Нижняя строка (Дата + Кнопка)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,

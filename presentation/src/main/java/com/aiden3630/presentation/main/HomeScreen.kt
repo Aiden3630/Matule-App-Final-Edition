@@ -47,7 +47,7 @@ fun HomeScreen(
     var selectedProductForSheet by remember { mutableStateOf<Product?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val categories = listOf("Все", "Мужчинам", "Женщинам", "Детям")
+    val categories = listOf("Все", "Женщинам", "Мужчинам", "Детям")
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -57,7 +57,7 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp),
             contentPadding = PaddingValues(bottom = 120.dp)
         ) {
-            // Поиск
+            // --- 1. Поиск ---
             item {
                 Spacer(modifier = Modifier.height(20.dp))
                 MatuleSearchField(
@@ -67,9 +67,9 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Баннеры
+            // --- 2. Баннеры ---
             item {
-                Text(text = "Акции и новости", style = Title3)
+                Text(text = "Акции и новости", style = Title3, color = MatuleTextGray)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -80,7 +80,6 @@ fun HomeScreen(
                             gradient = Brush.linearGradient(listOf(Color(0xFF97D9F0), Color(0xFF92E9D4))),
                             imageRes = UiKitR.drawable.im_banner_1,
                             onClick = {
-                                // Ищем товар с ID 2 в списке
                                 selectedProductForSheet = products.find { it.id == 2 }
                             }
                         )
@@ -92,7 +91,6 @@ fun HomeScreen(
                             gradient = Brush.linearGradient(listOf(Color(0xFF76B3FF), Color(0xFFCDE3FF))),
                             imageRes = UiKitR.drawable.im_banner_1,
                             onClick = {
-                                // Ищем товар с ID 1 в списке
                                 selectedProductForSheet = products.find { it.id == 1 }
                             }
                         )
@@ -101,9 +99,9 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Категории
+            // --- 3. Категории ---
             item {
-                Text(text = "Каталог описаний", style = Title3)
+                Text(text = "Каталог описаний", style = Title3, color = MatuleTextGray)
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(categories.size) { index ->
@@ -117,7 +115,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Товары
+            // --- 4. Товары ---
             items(products) { product ->
                 val isProductInCart = cartItems.any { it.product.id == product.id }
 
@@ -129,7 +127,6 @@ fun HomeScreen(
                     onAddClick = { cartViewModel.onPlusClick(product) },
                     onRemoveClick = { cartViewModel.onDeleteClick(product) },
                     onClick = {
-                        // При клике на товар открываем шторку
                         selectedProductForSheet = product
                     }
                 )
@@ -137,7 +134,7 @@ fun HomeScreen(
             }
         }
 
-        // Кнопка Корзины
+        // --- 5. Кнопка Корзины ---
         if (cartTotal > 0) {
             Box(
                 modifier = Modifier
@@ -173,6 +170,7 @@ fun HomeScreen(
             }
         }
 
+        // --- Шторка ---
         if (selectedProductForSheet != null) {
             ModalBottomSheet(
                 onDismissRequest = { selectedProductForSheet = null },
@@ -184,8 +182,9 @@ fun HomeScreen(
                     title = selectedProductForSheet!!.title,
                     price = "${selectedProductForSheet!!.price} ₽",
                     description = selectedProductForSheet!!.description,
+                    consumption = selectedProductForSheet!!.consumption, // 👈 Передаем расход
                     onDismiss = { selectedProductForSheet = null },
-                    onAddToCart = {
+                    onAddToCart ={
                         cartViewModel.onPlusClick(selectedProductForSheet!!)
                         selectedProductForSheet = null
                     }
@@ -210,23 +209,35 @@ fun BannerItem(
             .clip(RoundedCornerShape(12.dp))
             .background(gradient)
             .clickable { onClick() }
-            .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
     ) {
-        Column(modifier = Modifier.width(140.dp).fillMaxHeight()) {
-            Text(text = title, style = Title2.copy(color = MatuleWhite, fontSize = 20.sp), lineHeight = 24.sp)
+        // Слой 1: Текст
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxHeight()
+                .width(140.dp)
+                .zIndex(2f)
+        ) {
+            Text(
+                text = title,
+                style = Title2.copy(color = MatuleWhite, fontSize = 20.sp),
+                lineHeight = 24.sp
+            )
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = price, style = Title2.copy(color = MatuleWhite, fontSize = 20.sp))
+            Text(
+                text = price,
+                style = Title2.copy(color = MatuleWhite, fontSize = 20.sp)
+            )
         }
 
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = null,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.FillHeight, // Растягиваем по высоте
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .height(160.dp)
-                .width(140.dp)
-                .offset(x = 10.dp, y = 15.dp)
+                .height(200.dp) // Ставим большую высоту
+                .offset(x = 4.dp, y = 7.dp) // Сдвигаем в угол
         )
     }
 }

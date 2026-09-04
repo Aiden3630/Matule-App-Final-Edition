@@ -47,7 +47,10 @@ class AuthRepositoryImpl @Inject constructor(
             tokenManager.saveUserInfo(
                 email = foundUser.email ?: email,
                 name = foundUser.name,
-                surname = foundUser.surname
+                surname = foundUser.surname,
+                patronymic = "", // Добавляем недостающие параметры
+                birthDate = "",
+                gender = ""
             )
 
             Log.d("AuthRepository", "Успешный вход пользователя: ${foundUser.email}")
@@ -77,7 +80,8 @@ class AuthRepositoryImpl @Inject constructor(
             password = password,
             name = name,
             surname = surname,
-            avatar = null
+            avatar = null,
+
         )
 
         // Записываем нового пользователя в физический JSON-файл на устройстве
@@ -91,7 +95,10 @@ class AuthRepositoryImpl @Inject constructor(
         tokenManager.saveUserInfo(
             email = email,
             name = name,
-            surname = surname
+            surname = surname,
+            patronymic = "",
+            birthDate = "",
+            gender = ""
         )
 
         Log.d("AuthRepository", "Новый пользователь успешно зарегистрирован: $email")

@@ -31,13 +31,17 @@ class JsonDbManager @Inject constructor(
     private val mutex = Mutex()
 
     // Получить файл (или создать, если нет)
-    private fun getFile(): File {
-        val file = File(context.filesDir, fileName)
-        if (!file.exists()) {
-            file.createNewFile()
-            file.writeText("[]") // Записываем пустой массив
+    private fun getFile(): java.io.File {
+        // 👇 ИСПОЛЬЗУЕМ ТУ ЖЕ ПАПКУ getExternalFilesDir(null)
+        val externalAppFolder = context.getExternalFilesDir(null)
+        val databaseFile = java.io.File(externalAppFolder, fileName)
+
+        if (!databaseFile.exists()) {
+            databaseFile.createNewFile()
+            databaseFile.writeText("[]") // Инициализация пустым списком
+            android.util.Log.d("JsonDbManager", "Файл пользователей создан по адресу: ${databaseFile.absolutePath}")
         }
-        return file
+        return databaseFile
     }
 
     // Читаем пользователей

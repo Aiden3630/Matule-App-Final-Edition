@@ -39,7 +39,7 @@ fun MatuleChip(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             ),
-            color = if (isSelected) MatuleWhite else MatuleBlack
+            color = if (isSelected) MatuleWhite else MatuleTextGray
         )
     }
 }

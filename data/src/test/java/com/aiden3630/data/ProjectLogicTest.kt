@@ -21,7 +21,16 @@ class ProjectLogicTest {
     fun `test create project`() = runTest {
         coEvery { tokenManager.getProjects() } returns flowOf("[]")
 
-        repo.createProject("Title", "Type", "Date", null)
+        repo.createProject(
+            name = "Мой первый проект",
+            type = "Вязание",
+            dateStart = "01.02.2026",
+            dateEnd = "20.02.2026",
+            imageUri = null,         // Картинка в тесте может быть null
+            category = "Одежда",      // Категория, которую мы синхронизировали
+            toWhom = "Себе",         // Новое поле
+            source = "Pinterest"     // Новое поле
+        )
 
         coVerify { tokenManager.saveProjects(any()) }
     }

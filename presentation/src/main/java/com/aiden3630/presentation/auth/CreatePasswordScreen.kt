@@ -22,6 +22,7 @@ fun CreatePasswordScreen(
 ) {
     val context = LocalContext.current
     var password by remember { mutableStateOf("") }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
     var confirmPassword by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->

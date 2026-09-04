@@ -69,7 +69,7 @@ fun MatuleTextField(
                 .height(48.dp)
                 .background(
                     color = if (isError) MatuleRedBg else MatuleInputBg,
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
                 .border(
                     width = 1.dp,
@@ -78,7 +78,7 @@ fun MatuleTextField(
                         isFocused -> MatuleBlueFocused
                         else -> MatuleInputStroke
                     },
-                    shape = RoundedCornerShape(14.dp)
+                    shape = RoundedCornerShape(10.dp)
                 )
                 .clickable(enabled = readOnly && onClick != null) { onClick?.invoke() },
             contentAlignment = Alignment.CenterStart

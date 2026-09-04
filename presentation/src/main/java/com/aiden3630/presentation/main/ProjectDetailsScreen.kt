@@ -11,13 +11,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import com.aiden3630.presentation.theme.*
 import java.io.File
 import com.aiden3630.presentation.R
+import com.aiden3630.presentation.utils.ProjectInactivityWorker
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun ProjectDetailsScreen(
@@ -27,10 +33,30 @@ fun ProjectDetailsScreen(
     viewModel: ProjectDetailsViewModel = hiltViewModel()
 ) {
     val projectState by viewModel.project.collectAsState()
+    val context = LocalContext.current
 
     // Загружаем данные проекта при открытии
     LaunchedEffect(projectId) {
         viewModel.loadProject(projectId)
+    }
+    DisposableEffect(projectId) {
+        // 1. Когда экран открылся — ставим задачу в WorkManager
+        val workRequest = OneTimeWorkRequestBuilder<ProjectInactivityWorker>()
+            .setInitialDelay(3, TimeUnit.MINUTES) // 👈 3 минуты по ТЗ
+            .addTag("project_timer")
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "project_inactivity_${projectId}",
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+
+        // 2. Когда пользователь уходит с экрана (назад или на редактирование)
+        onDispose {
+            // Отменяем уведомление, так как неактивность прервана
+            WorkManager.getInstance(context).cancelUniqueWork("project_inactivity_${projectId}")
+        }
     }
 
     if (projectState == null) {

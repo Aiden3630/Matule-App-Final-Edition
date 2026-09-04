@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ShopRepository {
     fun getProducts(): Flow<List<Product>>
+    suspend fun addProductToRemoteCart(productId: String, count: Int)
 }

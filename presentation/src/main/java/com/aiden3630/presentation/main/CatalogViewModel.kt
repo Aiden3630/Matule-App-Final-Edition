@@ -30,7 +30,25 @@ class CatalogViewModel @Inject constructor(
     val filteredProducts = combine(_allProducts, _searchText, _selectedCategory) { products, text, category ->
         products.filter { product ->
             val matchesSearch = product.title.contains(text, ignoreCase = true)
-            val matchesCategory = if (category == "Все") true else product.category == category
+
+            val matchesCategory = when (category) {
+                "Все" -> true
+                "Женщинам" -> {
+                    // Ищем и точное совпадение, и вариант из твоего JSON
+                    product.category == "Женщинам" || product.category == "Женская одежда"
+                }
+                "Мужчинам" -> {
+                    product.category == "Мужчинам" || product.category == "Мужская одежда"
+                }
+                "Детям" -> {
+                    product.category == "Детям" || product.category == "Детская одежда"
+                }
+                "Аксессуары" -> {
+                    product.category == "Аксессуары" || product.category == "Аксессуары"
+                }
+                else -> product.category == category
+            }
+
             matchesSearch && matchesCategory
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

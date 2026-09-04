@@ -15,6 +15,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -46,3 +48,23 @@ object AuthModule {
         return ShopRepositoryImpl(context)
     }
 }
+/**
+ * DTO для запроса на добавление товара в корзину на сервере.
+ */
+@Serializable
+data class CartRequest(
+    @SerialName("user_id") val userId: String,
+    @SerialName("product_id") val productId: String,
+    @SerialName("count") val count: Int
+)
+
+/**
+ * DTO ответа сервера после добавления в корзину.
+ */
+@Serializable
+data class CartResponse(
+    @SerialName("id") val id: String,
+    @SerialName("user_id") val userId: String,
+    @SerialName("product_id") val productId: String,
+    @SerialName("count") val count: Int
+)

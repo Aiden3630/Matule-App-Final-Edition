@@ -23,28 +23,19 @@ class AuthRepositoryTest {
 
     @Test
     fun `signIn saves token and user info`() = runTest {
-        // GIVEN (Дано)
         val email = "test@mail.ru"
         val password = "pass"
 
-        // Настраиваем фейковую базу: когда попросят getAllUsers, верни список с одним юзером
         coEvery { jsonDbManager.getAllUsers() } returns listOf(
-            UserDto(
-                id = "123",
-                email = email,
-                password = password,
-                name = "TestName",
-                surname = "TestSurname"
-            )
+            UserDto("123", email, password, "TestName", "TestSurname", null)
         )
 
-        // WHEN (Когда)
         repository.signIn(email, password)
 
-        // THEN (Тогда проверяем)
-        // Проверяем, что репозиторий сохранил токен
         coVerify { tokenManager.saveToken(any()) }
-        // Проверяем, что репозиторий сохранил данные профиля
-        coVerify { tokenManager.saveUserInfo(email, "TestName", "TestSurname") }
+        // 👇 ИСПРАВЛЕНО: Добавили 3 пустых строки (или any()), чтобы соответствовать функции
+        coVerify {
+            tokenManager.saveUserInfo(email, "TestName", "TestSurname", any(), any(), any())
+        }
     }
 }
